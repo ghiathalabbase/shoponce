@@ -4,3 +4,4 @@ djangorestframework v3.14.0
 pillow v9.4.0
 react v18.2.0
 react-dom v18.2.0
+vite v4.0.0
