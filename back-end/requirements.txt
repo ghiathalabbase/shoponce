@@ -1,0 +1,7 @@
+Django  v4.1.5
+django-cors-headers v3.13.0
+djangorestframework v3.14.0
+pillow v9.4.0
+react v18.2.0
+react-dom v18.2.0
+vite v4.0.0
