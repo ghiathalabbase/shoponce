@@ -15,6 +15,9 @@ a {
 header {
   background-color: #2890a7;
 }
+header a {
+  color: white;
+}
 header nav img {
   width: 40px;
 }/*# sourceMappingURL=main.css.map */

@@ -2,7 +2,7 @@ import React from 'react'
 import avatar from '../assets/avatar.svg'
 const Header = () => {
   return (
-    <header className='d-flex justify-content-between align-items-center p-3 text-white'>
+    <header className='d-flex justify-content-between align-items-center p-3'>
       <h1 className='logo m-0'><a href="/">Logo</a></h1>
       <nav className='d-flex align-items-center gap-3'>
         <ul className='d-flex gap-3 m-0'>
