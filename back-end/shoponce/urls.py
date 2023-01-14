@@ -15,7 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from .settings import MEDIA_ROOT, SHOP_MEDIA_URL, PRODUCT_MEDIA_URL, USER_MEDIA_URL 
+from django.conf.urls.static import static
+import os
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 ]
+
+urlpatterns += static(SHOP_MEDIA_URL, document_root=os.path.join(MEDIA_ROOT, SHOP_MEDIA_URL))
+urlpatterns += static(PRODUCT_MEDIA_URL, document_root=os.path.join(MEDIA_ROOT, PRODUCT_MEDIA_URL))
+urlpatterns += static(USER_MEDIA_URL, document_root=os.path.join(MEDIA_ROOT, USER_MEDIA_URL))
