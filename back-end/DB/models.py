@@ -8,7 +8,7 @@ PRODUCTS_IMAGES_DIR = 'products images'
 class User(AbstractUser):
   email = models.EmailField(unique=True)
   #X birth_date = models.DateField()
-  #X gender = models.BooleanField()
+  gender = models.BooleanField()
   profile_image = models.ImageField(upload_to='users images', default='users images/default profile img.jpg')
   favos_products = models.ManyToManyField('Product', through='FavouriteProducts')
   favos_categories = models.ManyToManyField('Categorey', through='FavouriteCategories')
@@ -80,6 +80,9 @@ class CategoriesStores(models.Model):
 class TagsStores(models.Model):
   tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
   store = models.ForeignKey(Store, on_delete=models.CASCADE)
+
+  def __str__(self):
+      return self.store.name + " | " + self.tag.name
 
 class Branch(models.Model):
   store = models.ForeignKey(Store, on_delete=models.CASCADE)
