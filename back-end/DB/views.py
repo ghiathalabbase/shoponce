@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from .forms import UserForm
 from json import dumps
 from django.middleware.csrf import get_token
 from django.contrib.auth import authenticate,login
