@@ -8,7 +8,7 @@ PRODUCTS_IMAGES_DIR = 'products images'
 class User(AbstractUser):
   email = models.EmailField(unique=True)
   #X birth_date = models.DateField()
-  gender = models.BooleanField()
+  gender = models.BooleanField(default=True)
   profile_image = models.ImageField(upload_to='users images', default='users images/default profile img.jpg')
   favos_products = models.ManyToManyField('Product', through='FavouriteProducts')
   favos_categories = models.ManyToManyField('Categorey', through='FavouriteCategories')
