@@ -2,14 +2,14 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-STORES_IMAGES_DIR = 'stores images'
-PRODUCTS_IMAGES_DIR = 'products images'
+STORES_IMAGES_DIR = 'stores_images'
+PRODUCTS_IMAGES_DIR = 'products_images'
 # Create your models here.
 class User(AbstractUser):
   email = models.EmailField(unique=True)
   #X birth_date = models.DateField()
   gender = models.BooleanField(default=True)
-  profile_image = models.ImageField(upload_to='users images', default='users images/default profile img.jpg')
+  profile_image = models.ImageField(upload_to='users_images', default='users_images/default_profile_img.jpg')
   favos_products = models.ManyToManyField('Product', through='FavouriteProducts')
   favos_categories = models.ManyToManyField('Categorey', through='FavouriteCategories')
   favos_tags = models.ManyToManyField('Tag', through='FavouriteTags')
