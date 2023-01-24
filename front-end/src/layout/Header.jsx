@@ -11,6 +11,7 @@ function Header() {
         setProfileImg(userContext.user.profile_image);
       }
     } catch {
+      return
     }
   }, [userContext])
   function logout() {
@@ -25,14 +26,14 @@ function Header() {
           <ul className='d-flex gap-3 m-0 fs-5'>
             <li><NavLink to='/' >Home</NavLink></li>
             <li><NavLink to='/stores' >Stores</NavLink></li>
-            <li><NavLink >Categories</NavLink></li>
-            <li><NavLink >Products</NavLink></li>
-            <li><NavLink >Contact Us</NavLink></li>
-            <li><NavLink >About Us</NavLink></li>
+            <li><NavLink to='' >Categories</NavLink></li>
+            <li><NavLink to='' >Products</NavLink></li>
+            <li><NavLink to='' >Contact Us</NavLink></li>
+            <li><NavLink to='' >About Us</NavLink></li>
             {userContext.user.is_authenticated}
             {userContext.user.is_authenticated?<li><a onClick={logout} href="/">Logout</a></li>:null}
           </ul>
-          <NavLink to='profile/' className='profile'><span></span><img src={profileImg? `http://127.0.0.1:8000${profileImg}`: avatar} alt="profile" className=''/></NavLink>
+          <NavLink to='profile/' className='profile'><span></span><img src={profileImg? `http://127.0.0.1:8000${profileImg}`: avatar} alt="profile" className='rounded-pill'/></NavLink>
         </nav>
       </div>
     </header>

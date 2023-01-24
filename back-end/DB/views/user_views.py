@@ -27,23 +27,23 @@ class LoginView(View):
     token = get_token(request)
     return JsonResponse({'token':token})
   def post(self, request):
-    user_credentials = load(request)
+    credentials = load(request)
     user = None
     try:
-      user = User.objects.get(username=user_credentials.get('username'))
+      user = User.objects.get(username=credentials.get('username'))
     except:
-      response = HttpResponse(dumps({'Error':'Username Not Found'}))
-      return response
-    if check_password(user_credentials.get('password'),user.password):
+      return JsonResponse('Username Not Found', safe=False)
+    password_authenticity = check_password(password=credentials.get('password'),encoded=user.password)
+    if password_authenticity:
       login(request, user)
       serialized_user = UserSerializer(instance=user)
       user = dict(**serialized_user.data)
       user.update(is_authenticated=True)
       return JsonResponse(user)
     else:
-      response = HttpResponse(dumps({'Error':'Wrong password'}))
-      return response
-
+      return JsonResponse('Wrong Password', safe=False)
+    
+# Logout View
 class LogoutView(View):
   def get(self, request):
     request.session.delete()
@@ -53,7 +53,6 @@ class LogoutView(View):
 # Profile Getter View 
 class UserProfileView(View):
   def get(self,request):
-
     if request.user.is_authenticated:
       serialized_user = UserSerializer(instance=request.user)
       user = dict(**serialized_user.data)

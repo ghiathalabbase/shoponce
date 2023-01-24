@@ -4,7 +4,7 @@ import { useCSRFSetter, useCSRFCookieGetter } from '../hooks/CSRFHooks';
 import { UserContext } from "../context/UserContext";
 
 function Login() {
-  const [error, setError] = useState(null)
+  const [wrong, setWrong] = useState(null)
   const userContext = useContext(UserContext)
   const [csrftoken, setCSRFToken] = useState(useCSRFCookieGetter())
   const navigate = useNavigate()
@@ -16,6 +16,7 @@ function Login() {
     }
   }, [userContext])
   async function login(event) {
+    setWrong('Logging In...')
     event.preventDefault()
     const credentials = {
       username : document.getElementById('username').value,
@@ -32,12 +33,13 @@ function Login() {
       
     })
     const data = await response.json()
-    setError(data.Error)
     if (data.is_authenticated) {
       userContext.setUser(data)
       // ????
       navigate('/profile')
-    } 
+    } else {
+      setWrong(data)
+    }
   }
   return( 
     <>
@@ -49,7 +51,7 @@ function Login() {
         <input id='password' type="password" name="password"/>
         <button type="submit">Register</button>
       </form>
-      {error}
+      {wrong}
     </>
   )
 }
