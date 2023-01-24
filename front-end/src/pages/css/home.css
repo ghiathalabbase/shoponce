@@ -1,6 +1,6 @@
 
   /* Home (Start) */
-.heading {
+  .heading {
     border-left: solid 12px var(--header-hover-color);
 }
 .heading h2{

@@ -1,24 +1,23 @@
-import { useEffect } from "react"
-import Header from "../layout/Header"
+import { useEffect } from "react";
+import { Form } from "react-router-dom";
+import { useCSRFSetter, useCSRFCookieGetter } from "../hooks/CSRFHooks";
 function Register() {
-  // useEffect(() => {
-  //   async function getToken() {
-  //     const token = await (await fetch('http://127.0.0.1:8000/register/')).json()
-  //     console.log(token)
-  //     console.log('kk')
-  //   }
-  //   getToken()
-  // })
+  useEffect(() => {
+    useCSRFSetter()
+  }, [])
   return (
     <>
-      <form method="post" action="http://127.0.0.1:8000/register/">
+      <Form method="post"  >
         <label htmlFor="">Username: </label>
-        <input type="text" placeholder="ghiath_abbas" name="username"/>
+        <input type="text" value="username" placeholder="ghiath_abbas" name="username"/>
+        <br />
+        <label htmlFor="">Email: </label>
+        <input type="text" value="username@gmail.com" placeholder="ghiath@gmail.com" name="email"/>
         <br />
         <label htmlFor="">Password: </label>
-        <input type="password" name="password"/>
+        <input type="password" value="username" name="password"/>
         <button type="submit">Register</button>
-      </form>
+      </Form>
     </>
   )
 }

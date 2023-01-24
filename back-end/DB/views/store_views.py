@@ -1,5 +1,5 @@
 from DB.models import Store
-from DB.all_serializers.store_serializers import TopStoresSerializer
+from DB.serializers.store_serializers import TopStoresSerializer
 from rest_framework import status
 from rest_framework.views import APIView
 from django.http import JsonResponse

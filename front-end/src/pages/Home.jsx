@@ -1,5 +1,4 @@
 import React from 'react'
-// import Header from '../layout/Header'
 import TopStore from '../components/topStore'
 import HomeSlider from '../components/HomeSlider'
 import {useState, useEffect} from 'react'

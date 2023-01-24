@@ -27,7 +27,6 @@ SECRET_KEY = 'django-insecure-q15_vgsl2u8%9@ti)e%7(@q5jxxp^ytmi3g$0e*6a837n9szm=
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Application definition
@@ -55,7 +54,9 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'shoponce.urls'
-
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS =['http://127.0.0.1:5173']
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
