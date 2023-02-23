@@ -1,17 +1,17 @@
-import re
 from django.db import models
 from django.contrib.auth.models import UserManager, PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils.deconstruct import deconstructible
-from django.core import validators, mail
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
+from django.core.mail import send_mail
+from django.core.validators import MinValueValidator, MaxValueValidator,RegexValidator
 STORES_IMAGES_DIR = 'stores_images'
 PRODUCTS_IMAGES_DIR = 'products_images'
 # Create your models here.
 
 @deconstructible
-class UnicodeUsernameValidator(validators.RegexValidator):
+class UnicodeUsernameValidator(RegexValidator):
   regex = r"^\w+\Z"
   message = _("Enter a valid username. This value may contain only letters, numbers, ./_ characters.")
   flags = 0
@@ -25,7 +25,6 @@ class AbstractUser(AbstractBaseUser,PermissionsMixin):
   Username, email and password are required. Other fields are optional.
   """
 
-  last_login = None
   username_validator = UnicodeUsernameValidator()
 
   username = models.CharField(
@@ -38,7 +37,8 @@ class AbstractUser(AbstractBaseUser,PermissionsMixin):
 
   email = models.EmailField(
     verbose_name=_('email address'),
-    unique=True
+    unique=True,
+    error_messages={"unique": _("This email is already tokey, user another one.")}
   )
 
   is_staff = models.BooleanField(
@@ -47,6 +47,8 @@ class AbstractUser(AbstractBaseUser,PermissionsMixin):
     help_text=_("Designates whether the user can log into this admin site."),
   )
 
+  date_joined = models.DateTimeField(default=timezone.now())
+  
   objects = UserManager()
 
   EMAIL_FIELD = 'email'
@@ -65,7 +67,7 @@ class AbstractUser(AbstractBaseUser,PermissionsMixin):
 
   def email_user(self, subject, message, from_email=None, **kwargs):
       """Send an email to this user."""
-      mail.send_mail(subject, message, from_email, [self.email], **kwargs)
+      send_mail(subject, message, from_email, [self.email], **kwargs)
   def __str__(self):
       return self.username
   
@@ -73,14 +75,12 @@ class User(AbstractUser):
   pass
 
 class Profile(models.Model):
-
+  name = models.CharField(max_length=150)
   user = models.OneToOneField(User,on_delete=models.CASCADE)
-  date_joined = models.DateTimeField(auto_now=True)
-  last_login = models.DateTimeField(blank=True, null=True)
   profile_image = models.ImageField(
-    upload_to='users_images',
-    default='users_images/default_profile_img.jpg',
-    null=True
+    upload_to='profiles_images',
+    null=True,
+    blank=True
   )
   favos_products = models.ManyToManyField('Product', through='FavouriteProducts')
   favos_categories = models.ManyToManyField('Categorey', through='FavouriteCategories')
