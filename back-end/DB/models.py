@@ -1,21 +1,95 @@
+import re
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import UserManager, PermissionsMixin
+from django.contrib.auth.base_user import AbstractBaseUser
+from django.utils.deconstruct import deconstructible
+from django.core import validators, mail
+from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
-
 STORES_IMAGES_DIR = 'stores_images'
 PRODUCTS_IMAGES_DIR = 'products_images'
 # Create your models here.
+
+@deconstructible
+class UnicodeUsernameValidator(validators.RegexValidator):
+  regex = r"^\w+\Z"
+  message = _("Enter a valid username. This value may contain only letters, numbers, ./_ characters.")
+  flags = 0
+
+
+class AbstractUser(AbstractBaseUser,PermissionsMixin):
+  """
+  An abstract base class implementing a fully featured User model with
+  admin-compliant permissions.
+
+  Username, email and password are required. Other fields are optional.
+  """
+
+  last_login = None
+  username_validator = UnicodeUsernameValidator()
+
+  username = models.CharField(
+    verbose_name=_("username"),
+    max_length=60,
+    unique=True,
+    validators=[username_validator],
+    error_messages={"unique": _("This username is already token, use another one.")}
+  )
+
+  email = models.EmailField(
+    verbose_name=_('email address'),
+    unique=True
+  )
+
+  is_staff = models.BooleanField(
+    _("staff status"),
+    default=False,
+    help_text=_("Designates whether the user can log into this admin site."),
+  )
+
+  objects = UserManager()
+
+  EMAIL_FIELD = 'email'
+  USERNAME_FIELD = 'email'
+  REQUIRED_FIELDS = ['username']
+
+  class Meta:
+      verbose_name = _("user")
+      verbose_name_plural = _("users")
+      abstract = True
+      swappable = "AUTH_USER_MODEL"
+
+  def clean(self):
+        super().clean()
+        self.email = self.__class__.objects.normalize_email(self.email)
+
+  def email_user(self, subject, message, from_email=None, **kwargs):
+      """Send an email to this user."""
+      mail.send_mail(subject, message, from_email, [self.email], **kwargs)
+  def __str__(self):
+      return self.username
+  
 class User(AbstractUser):
-  email = models.EmailField(unique=True)
-  #X birth_date = models.DateField()
-  gender = models.BooleanField(default=True)
-  profile_image = models.ImageField(upload_to='users_images', default='users_images/default_profile_img.jpg')
+  pass
+
+class Profile(models.Model):
+
+  user = models.OneToOneField(User,on_delete=models.CASCADE)
+  date_joined = models.DateTimeField(auto_now=True)
+  last_login = models.DateTimeField(blank=True, null=True)
+  profile_image = models.ImageField(
+    upload_to='users_images',
+    default='users_images/default_profile_img.jpg',
+    null=True
+  )
   favos_products = models.ManyToManyField('Product', through='FavouriteProducts')
   favos_categories = models.ManyToManyField('Categorey', through='FavouriteCategories')
   favos_tags = models.ManyToManyField('Tag', through='FavouriteTags')
+  country = models.ForeignKey('Country', on_delete=models.SET_NULL, null=True)
   city = models.ForeignKey('City',on_delete=models.SET_NULL, null=True)
+  # REQUIRED_FIELDS=[]
 
-  # REQUIRED_FIELDS=['username']
+
 class Country(models.Model):
   name = models.CharField(max_length=50)
 
@@ -38,7 +112,7 @@ class Categorey(models.Model):
 
 class FavouriteCategories(models.Model):
   categorey = models.ForeignKey(Categorey, on_delete=models.CASCADE)
-  user = models.ForeignKey(User, on_delete=models.CASCADE)
+  profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
 
   def __str__(self):
       return self.user.username + " | " + self.categorey.name
@@ -53,7 +127,7 @@ class Tag(models.Model):
 
 class FavouriteTags(models.Model):
   tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-  user = models.ForeignKey(User, on_delete=models.CASCADE)
+  profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
 
   def __str__(self):
       return self.user.username + " | " + self.tag.name
@@ -128,7 +202,7 @@ class ProductImages(models.Model):
   product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
 class FavouriteProducts(models.Model):
-  user = models.ForeignKey(User, on_delete=models.CASCADE)
+  profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
   product = models.ForeignKey(Product,on_delete=models.CASCADE)
 
   def __str__(self):
