@@ -38,10 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'DB.apps.DbConfig',
+    'rest_framework',
+    'authentication',
+    'DB',
     "corsheaders",
 ]
-AUTH_USER_MODEL = 'DB.User'
+AUTH_USER_MODEL = 'authentication.User'
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
@@ -89,12 +91,12 @@ DATABASES = {
 }
 
 # Cache
-CACHES ={
-    'default':{
-        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-        "LOCATION":'127.0.0.1:11211'
-    }
-}
+# CACHES ={
+#     'default':{
+#         'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+#         "LOCATION":'127.0.0.1:11211'
+#     }
+# }
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 

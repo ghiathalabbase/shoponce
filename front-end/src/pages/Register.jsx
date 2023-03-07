@@ -47,7 +47,7 @@ function Register() {
 
         if (this.regexp) {
           if (!this.regexp.test(this.value))
-          return this.regexp.test(this.value)
+          return false
         }
 
         if (this.validators) {
@@ -158,14 +158,15 @@ function Register() {
 
       // Gathering data from fields
       let formData = { user: {}, user_profile: {} }
+      let AuthenticationFields = ['username', 'email', 'password']
       for (const key of fieldsKeys) {
-        if (key === 'username' || key === 'email' || key === 'password') {
+        if (AuthenticationFields.includes(key)) {
           formData.user[key] = fields[key].value
         } else {
           formData.user_profile[key] = fields[key].value
         }
       }
-      const response = await (await fetch('http://127.0.0.1:8000/register/', {
+      const response = await (await fetch('http://127.0.0.1:8000/auth/register/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -180,9 +181,8 @@ function Register() {
       const errors = response.errors
       if (errors) {
         console.log(errors)
-        for (const key in errors) {
-          document.querySelector(`#${key} #invalid-message`).textContent = errors[key][0]
-        }
+        document.querySelector(`#username #invalid-message`).textContent = errors['username'] ? errors['username'][0] : ""
+        document.querySelector(`#email #invalid-message`).textContent = errors['email'] ? errors['email'][0] : ""
       } else {
         console.log(response)
         navigate('/', { state: response.message })

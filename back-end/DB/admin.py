@@ -1,6 +1,5 @@
 from django.contrib import admin
-from DB.models import User, Profile, Country, City, Category, Tag, Store, Product, FavouriteCategories,FavouriteTags, CategoriesStores,TagsStores,Branch,BranchImages,Product,ProductImages,FavouriteProducts
-admin.site.register(User)
+from .models import Profile, Country, City, Category, Tag, Store, Product, FavouriteCategories,FavouriteTags, CategoriesStores,TagsStores,Branch,BranchImages,Product,ProductImages,FavouriteProducts
 admin.site.register(Profile)
 admin.site.register(Country)
 admin.site.register(City)

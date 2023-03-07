@@ -21,7 +21,7 @@ function Login() {
     const form = document.getElementById('login-form')
     let credentials = new FormData(form)
     credentials = Object.fromEntries(credentials)
-    const response = await fetch('http://127.0.0.1:8000/login/', {
+    const response = await fetch('http://127.0.0.1:8000/auth/login/', {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
