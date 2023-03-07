@@ -24,7 +24,7 @@ const showStore = (store) => {
     )
 }
 
-function TopStore(props) {
+function TopStores(props) {
     let store1 = props.data.top_stores[0]
     console.log(store1)
     return (
@@ -41,4 +41,4 @@ function TopStore(props) {
     )
 }
 
-export default TopStore
+export default TopStores

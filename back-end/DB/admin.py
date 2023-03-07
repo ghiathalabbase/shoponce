@@ -1,9 +1,10 @@
 from django.contrib import admin
-from DB.models import User, Country, City, Categorey, Tag, Store, Product, FavouriteCategories,FavouriteTags, CategoriesStores,TagsStores,Branch,BranchImages,Product,ProductImages,FavouriteProducts
+from DB.models import User, Profile, Country, City, Category, Tag, Store, Product, FavouriteCategories,FavouriteTags, CategoriesStores,TagsStores,Branch,BranchImages,Product,ProductImages,FavouriteProducts
 admin.site.register(User)
+admin.site.register(Profile)
 admin.site.register(Country)
 admin.site.register(City)
-admin.site.register(Categorey)
+admin.site.register(Category)
 admin.site.register(Tag)
 admin.site.register(Store)
 admin.site.register(Product)

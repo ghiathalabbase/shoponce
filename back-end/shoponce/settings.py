@@ -60,7 +60,9 @@ CSRF_TRUSTED_ORIGINS =['http://127.0.0.1:5173']
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, '')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -86,7 +88,13 @@ DATABASES = {
     }
 }
 
-
+# Cache
+CACHES ={
+    'default':{
+        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        "LOCATION":'127.0.0.1:11211'
+    }
+}
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -130,3 +138,10 @@ MEDIA_ROOT = BASE_DIR / 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'gh.oth.django@gmail.com'
+EMAIL_HOST_PASSWORD = 'fjuesgjwewwuimrf'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

@@ -1,12 +1,10 @@
 async function useCSRFSetter(setCSRFToken) {
-  if (!useCSRFCookieGetter()) {
-    const response = await fetch('http://127.0.0.1:8000/login/', {
+    const response = await fetch('http://127.0.0.1:8000/get-csrftoken', {
       method: 'GET',
       credentials: 'include'
     })
     const data = await response.json()
     setCSRFToken(useCSRFCookieGetter())
-  }
 }
 
 function useCSRFCookieGetter() {

@@ -1,0 +1,12 @@
+export { default as Products } from './Products';
+export { default as About } from './About';
+export { default as Categories } from './Categories';
+export { default as Contact } from './Contact';
+export { default as Dashboard } from './Dashboard';
+export { default as Home } from './Home';
+export { default as Login } from './Login';
+export { default as Product } from './Product';
+export { default as Profile} from './Profile';
+export { default as Register } from './Register';
+export { default as Store } from './Store';
+export { default as Stores } from './Stores';

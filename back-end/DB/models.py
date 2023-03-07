@@ -5,7 +5,7 @@ from django.utils.deconstruct import deconstructible
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.core.mail import send_mail
-from django.core.validators import MinValueValidator, MaxValueValidator,RegexValidator
+from django.core.validators import MinValueValidator, MaxValueValidator,RegexValidator, MinLengthValidator
 STORES_IMAGES_DIR = 'stores_images'
 PRODUCTS_IMAGES_DIR = 'products_images'
 # Create your models here.
@@ -16,29 +16,27 @@ class UnicodeUsernameValidator(RegexValidator):
   message = _("Enter a valid username. This value may contain only letters, numbers, ./_ characters.")
   flags = 0
 
-
-class AbstractUser(AbstractBaseUser,PermissionsMixin):
+class AbstractUser(AbstractBaseUser, PermissionsMixin):
   """
   An abstract base class implementing a fully featured User model with
   admin-compliant permissions.
-
   Username, email and password are required. Other fields are optional.
   """
 
-  username_validator = UnicodeUsernameValidator()
+  username_validators = [UnicodeUsernameValidator(), MinLengthValidator(6)]
 
   username = models.CharField(
     verbose_name=_("username"),
     max_length=60,
     unique=True,
-    validators=[username_validator],
-    error_messages={"unique": _("This username is already token, use another one.")}
+    validators=username_validators,
+    error_messages={"unique": _("This username is already taken, use another.")}
   )
 
   email = models.EmailField(
     verbose_name=_('email address'),
     unique=True,
-    error_messages={"unique": _("This email is already tokey, user another one.")}
+    error_messages={"unique": _("This email is already taken, user another.")}
   )
 
   is_staff = models.BooleanField(
@@ -46,8 +44,15 @@ class AbstractUser(AbstractBaseUser,PermissionsMixin):
     default=False,
     help_text=_("Designates whether the user can log into this admin site."),
   )
-
-  date_joined = models.DateTimeField(default=timezone.now())
+  is_active = models.BooleanField(
+    _("active"),
+    default=True,
+    help_text=_(
+        "Designates whether this user should be treated as active. "
+        "Unselect this instead of deleting accounts."
+    ),
+  )
+  date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
   
   objects = UserManager()
 
@@ -59,7 +64,6 @@ class AbstractUser(AbstractBaseUser,PermissionsMixin):
       verbose_name = _("user")
       verbose_name_plural = _("users")
       abstract = True
-      swappable = "AUTH_USER_MODEL"
 
   def clean(self):
         super().clean()
@@ -72,10 +76,11 @@ class AbstractUser(AbstractBaseUser,PermissionsMixin):
       return self.username
   
 class User(AbstractUser):
-  pass
+   pass
+
 
 class Profile(models.Model):
-  name = models.CharField(max_length=150)
+  name = models.CharField(max_length=100)
   user = models.OneToOneField(User,on_delete=models.CASCADE)
   profile_image = models.ImageField(
     upload_to='profiles_images',
@@ -83,11 +88,10 @@ class Profile(models.Model):
     blank=True
   )
   favos_products = models.ManyToManyField('Product', through='FavouriteProducts')
-  favos_categories = models.ManyToManyField('Categorey', through='FavouriteCategories')
+  favos_categories = models.ManyToManyField('Category', through='FavouriteCategories')
   favos_tags = models.ManyToManyField('Tag', through='FavouriteTags')
   country = models.ForeignKey('Country', on_delete=models.SET_NULL, null=True)
   city = models.ForeignKey('City',on_delete=models.SET_NULL, null=True)
-  # REQUIRED_FIELDS=[]
 
 
 class Country(models.Model):
@@ -103,7 +107,7 @@ class City(models.Model):
   def __str__(self):
       return self.name
 
-class Categorey(models.Model):
+class Category(models.Model):
   name = models.CharField(max_length=20)
   stores = models.ManyToManyField('Store', through='CategoriesStores')
 
@@ -111,15 +115,15 @@ class Categorey(models.Model):
       return self.name
 
 class FavouriteCategories(models.Model):
-  categorey = models.ForeignKey(Categorey, on_delete=models.CASCADE)
+  category = models.ForeignKey(Category, on_delete=models.CASCADE)
   profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
 
   def __str__(self):
-      return self.user.username + " | " + self.categorey.name
+      return self.user.username + " | " + self.category.name
 
 class Tag(models.Model):
   name = models.CharField(max_length=30)
-  categorey = models.ForeignKey(Categorey, on_delete=models.SET_NULL, null =True)
+  category = models.ForeignKey(Category, on_delete=models.SET_NULL, null =True)
   stores = models.ManyToManyField('Store', through='TagsStores')
 
   def __str__(self):
@@ -139,17 +143,17 @@ class Store(models.Model):
     description = models.TextField(null=True, blank=True)
     # main_image = models.ImageField(upload_to='stores images', null=True, blank=True)
     logo = models.ImageField(upload_to=STORES_IMAGES_DIR, null=True, blank=True)
-    categories = models.ManyToManyField(Categorey, through='CategoriesStores')
+    categories = models.ManyToManyField(Category, through='CategoriesStores')
 
     def __str__(self):
       return self.name
 
 class CategoriesStores(models.Model):
-  categorey = models.ForeignKey(Categorey, on_delete=models.CASCADE)
+  category = models.ForeignKey(Category, on_delete=models.CASCADE)
   store = models.ForeignKey(Store, on_delete=models.CASCADE)
 
   def __str__(self):
-      return self.store.name + " | " + self.categorey.name
+      return self.store.name + " | " + self.category.name
 
 class TagsStores(models.Model):
   tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
@@ -181,7 +185,7 @@ class Product(models.Model):
   price = models.IntegerField(validators=[MinValueValidator(0.0)])
   main_image = models.ImageField(upload_to=PRODUCTS_IMAGES_DIR, null=True, blank=True)
   description = models.TextField(null=True)
-  category = models.ForeignKey(Categorey, on_delete=models.SET_NULL, null=True)
+  category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
   tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True)
 
   def __str__(self):

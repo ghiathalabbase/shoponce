@@ -36,7 +36,7 @@ function UserContextProvider(props) {
       if (data.is_authenticated) {
         setUser(data)
       } else {
-        setUserContext({...userContext,user:{...userContext.user, is_authenticated: false}})
+        setUserContext({...userContext,user:{...userContext.user, ...data}})
       }
     }
     getUserInfo()

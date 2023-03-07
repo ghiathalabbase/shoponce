@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { useNavigate  } from "react-router-dom";
+import { NavLink, useNavigate  } from "react-router-dom";
 import { useCSRFSetter, useCSRFCookieGetter } from '../hooks/CSRFHooks';
 import { UserContext } from "../context/UserContext";
 
@@ -18,10 +18,9 @@ function Login() {
   async function login(event) {
     setWrong('Logging In...')
     event.preventDefault()
-    const credentials = {
-      username : document.getElementById('username').value,
-      password : document.getElementById('password').value
-    }
+    const form = document.getElementById('login-form')
+    let credentials = new FormData(form)
+    credentials = Object.fromEntries(credentials)
     const response = await fetch('http://127.0.0.1:8000/login/', {
       method: 'POST',
       headers: {
@@ -35,23 +34,22 @@ function Login() {
     const data = await response.json()
     if (data.is_authenticated) {
       userContext.setUser(data)
-      // ????
-      navigate('/profile')
     } else {
       setWrong(data)
     }
   }
-  return( 
+  return(!userContext.user.is_authenticated &&
     <>
-      <form onSubmit={login} method="post" action="http://127.0.0.1:8000/login/">
+      <form id="login-form" onSubmit={login} method="post">
         <label htmlFor="">Username: </label>
-        <input id='username' type="text" placeholder="ghiath_abbas" name="username"/>
+        <input type="text" placeholder="ghiath_abbas" name="username"/>
         <br />
         <label htmlFor="">Password: </label>
-        <input id='password' type="password" name="password"/>
-        <button type="submit">Register</button>
+        <input type="password" name="password"/>
+        <button type="submit">Login</button>
       </form>
       {wrong}
+      <NavLink to='/register'>Sign up</NavLink>
     </>
   )
 }

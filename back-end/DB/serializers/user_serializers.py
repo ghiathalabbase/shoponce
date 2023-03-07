@@ -1,10 +1,11 @@
 from rest_framework import serializers
-from DB.models import User
+from DB.models import User, Profile
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'gender', 'profile_image', 'email', 'username', 'city', 'favos_products', 'favos_categories', 'favos_tags')
-class UserFormSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'first_name', 'last_name', 'gender', 'profile_image', 'email', 'username', 'city')
+        fields = ('id', 'email', 'username')
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = Profile
+        fields = '__all__'
