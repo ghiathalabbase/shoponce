@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from json import dumps, loads
 from django.contrib.auth import login, logout
+from django.contrib.auth.hashers import check_password
 from DB.models import User, Profile, Country, City
 from django.views import View
 from DB.serializers.user_serializers import UserSerializer, ProfileSerializer
@@ -16,50 +17,52 @@ TRY_EMAIL = 'ghiathalabbase@gmail.com'
 
 class RegisterView(View):
     def post(self, request):
+        errors = {'errors': {}}
         register_info: dict = loads(request.body)
-        user_form = CreateUserForm(data=register_info['user'])
-        if user_form.is_valid():
-            code = register_info.get('user').get('username').encode('utf-8').hex()
-            # cache way
-            cache.set(code, register_info, 3600)
-            print(code)
-            print(cache.get(code))
-            # session way
-            # request.session[code] = register_info
-            # request.session.set_expiry(3600 * 48)
-            email = EmailMessage(
-                subject='Verification Email',
-                body="""Hello User, welcome to shoponce.
-                Please click on the link below to verify your account:
-                http://127.0.0.1:8000/auth/verification?code=%s
-                """ % code,
-                from_email=settings.EMAIL_HOST_USER,
-                to=[TRY_EMAIL],
-            )
-            try:
-                is_sent = email.send(fail_silently=False)
-            except Exception as error:
-                print(error)
-                return JsonResponse({'errors': {"email": ["Email is Not Found"]}})
-            return JsonResponse({
-                'message':
-                'We sent you a verification email containing a verification link, We need to make sure that this email is yours until we can create your account. "Note: you have two hours to verify your account."'
-            })
-        else:
-            return JsonResponse({'errors': user_form.errors})
+        encoded_username = register_info['user']['username'].encode('utf-8').hex()
+        if cache.get(encoded_username) is None:
+
+            user_form = CreateUserForm(data=register_info['user'])
+
+            if  user_form.is_valid():
+                cache.set(encoded_username, register_info, 3600)
+                print('http://127.0.0.1:8000/auth/verification?code=%s'% encoded_username)
+
+                # email = EmailMessage(
+                #     subject='Verification Email',
+                #     body="""Hello User, welcome to shoponce.
+                #     Please click on the link below to verify your account:
+                #     http://127.0.0.1:8000/auth/verification?code=%s
+                #     """ % code,
+                #     from_email=settings.EMAIL_HOST_USER,
+                #     to=[TRY_EMAIL],
+                # )
+                # try:
+                #     is_sent = email.send(fail_silently=False)
+                # except Exception as error:
+                #     return JsonResponse({'errors': {"email": ["Email is Not Found"]}})
+                return JsonResponse({
+                    'message':
+                    'We sent you a verification email containing a verification link, We need to make sure that this email is yours until we can create your account. "Note: you have two hours to verify your account."'
+                })
+            errors['errors'] = user_form.errors
+            return JsonResponse(errors)
+        
+        unique_error = 'This %s is already taken, use another.'
+        errors['errors']= {'username': [unique_error % 'username']}
+        if cache.get(encoded_username)['user']['email'] == register_info['user']['email']:
+            errors['errors']['email'] = [unique_error % 'email']
+            return JsonResponse(errors)
+        return JsonResponse(errors)
 
 class VerificatoinView(View):
     def get(self, request):
         code = self.request.GET.get('code')
-        # cache way
         register_info = cache.get(code)
-        # session way
-        # register_info = request.session.get(code)
         if register_info is not None:
-            new_user = User.objects.create(**register_info['user'])
+            new_user = User.objects.create_user(**register_info['user'])
             Profile.objects.create(user=new_user,**register_info['user_profile'])
             login(request, new_user)
-            # del request.session[code]
             cache.delete(code)
             return redirect('http://127.0.0.1:5173')
         else:
@@ -71,12 +74,11 @@ class LoginView(View):
     def post(self, request):
         credentials: dict = loads(self.request.body)
         user = None
-        print(self.request.user)
         try:
             user = User.objects.get(username=credentials.get('username'))
         except:
             return JsonResponse('Username Not Found', safe=False)
-        password_authenticity: bool = True if credentials.get('password') == user.password else False
+        password_authenticity: bool = check_password(credentials.get('password'), user.password)
         if password_authenticity:
             login(self.request, user)
             serialized_user = UserSerializer(instance=user)

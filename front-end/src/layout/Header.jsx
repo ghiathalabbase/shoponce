@@ -15,7 +15,7 @@ function Header() {
     }
   }, [userContext])
   function logout() {
-    fetch('http://127.0.0.1:8000/auth/logout/', { credentials: 'include' });
+    fetch('http://127.0.0.1:8000/auth/logout', { credentials: 'include' });
   }
   return (
     <header className='mb-5'>

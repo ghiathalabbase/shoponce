@@ -1,9 +1,8 @@
 async function useCSRFSetter(setCSRFToken) {
-    const response = await fetch('http://127.0.0.1:8000/get-csrftoken', {
+    const response =  fetch('http://127.0.0.1:8000/get-csrftoken', {
       method: 'GET',
       credentials: 'include'
     })
-    const data = await response.json()
     setCSRFToken(useCSRFCookieGetter())
 }
 
@@ -22,8 +21,4 @@ function useCSRFCookieGetter() {
   }
   return cookieValue;
 }
-// async function useUserGetter(){
-//   const userInfo = await (await (await fetch('http://127.0.0.1:8000/profile/')).json());
-//   if (!userInfo) redirect('/login')
-// }
 export {useCSRFSetter, useCSRFCookieGetter}

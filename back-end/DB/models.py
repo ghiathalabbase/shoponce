@@ -23,11 +23,14 @@ class Profile(models.Model):
     null=True,
     blank=True
   )
-  favos_products = models.ManyToManyField('Product', through='FavouriteProducts')
-  favos_categories = models.ManyToManyField('Category', through='FavouriteCategories')
-  favos_tags = models.ManyToManyField('Tag', through='FavouriteTags')
+  favo_products = models.ManyToManyField('Product', through='FavouriteProducts')
+  favo_categories = models.ManyToManyField('Category', through='FavouriteCategories')
+  favo_tags = models.ManyToManyField('Tag', through='FavouriteTags')
   country = models.ForeignKey('Country', on_delete=models.SET_NULL, null=True)
   city = models.ForeignKey('City',on_delete=models.SET_NULL, null=True)
+  
+  def __str__(self) -> str:
+     return self.name
 
 
 class Country(models.Model):

@@ -29,7 +29,7 @@ function UserContextProvider(props) {
   useEffect(() => {
     async function getUserInfo() {
       const data = await (
-        await fetch('http://127.0.0.1:8000/profile/', {
+        await fetch('http://127.0.0.1:8000/profile', {
           method: 'GET', credentials: 'include'
         })
       ).json();

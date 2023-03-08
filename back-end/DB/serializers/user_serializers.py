@@ -8,6 +8,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'email', 'username')
 
 class ProfileSerializer(serializers.ModelSerializer):
+    country = serializers.StringRelatedField()
+    city = serializers.StringRelatedField()
     class Meta: 
         model = Profile
-        fields = '__all__'
+        fields = ('name','country', 'city', 'profile_image', 'favo_products', 'favo_categories', 'favo_tags')

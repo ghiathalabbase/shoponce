@@ -70,7 +70,7 @@ function Register() {
   }
   const [fields, setFields] = useState(() => {
     return {
-      name: new Field(/^[A-Za-z]*$/, [], 'A Name Field Must Not Have Any Special Character, Numbers Or Whitespaces.'),
+      name: new Field(/^[A-Za-z\s]*$/, [], 'A Name Field Must Not Have Any Special Character, Numbers Or Whitespaces.'),
       username: new Field(/^\w{6,}$/i, [], 'Username Field Must Be At Least 8 Characters And Not Have Whitespaces Or Any Speical Character Except Underscore.'),
       email: new Field(/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/i,[], 'Invalid Email'),
       password: new Field(/.{8,}/i, [], 'your password must be at least 8 characters'),
@@ -166,7 +166,7 @@ function Register() {
           formData.user_profile[key] = fields[key].value
         }
       }
-      const response = await (await fetch('http://127.0.0.1:8000/auth/register/', {
+      const response = await (await fetch('http://127.0.0.1:8000/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
