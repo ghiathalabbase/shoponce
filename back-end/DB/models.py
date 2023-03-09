@@ -2,16 +2,6 @@ from django.db import models
 from authentication.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from django.utils.deconstruct import deconstructible
-
-from django.core.validators import RegexValidator, MinLengthValidator
-from django.utils.translation import gettext_lazy as _
-@deconstructible
-class UnicodeUsernameValidator(RegexValidator):
-    regex = r"^\w+\Z"
-    message = _("Enter a valid username. This value may contain only letters, numbers, ./_ characters.")
-    flags = 0
-
 STORES_IMAGES_DIR = 'stores_images'
 PRODUCTS_IMAGES_DIR = 'products_images'
 
