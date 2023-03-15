@@ -41,8 +41,8 @@ function Login() {
   return(!userContext.user.is_authenticated &&
     <>
       <form id="login-form" onSubmit={login} method="post">
-        <label htmlFor="">Username: </label>
-        <input type="text" placeholder="ghiath_abbas" name="username"/>
+        <label htmlFor="">Email: </label>
+        <input type="text" placeholder="othman@gmail.com" name="email"/>
         <br />
         <label htmlFor="">Password: </label>
         <input type="password" name="password"/>

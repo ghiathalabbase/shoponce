@@ -71,9 +71,9 @@ class LoginView(View):
         credentials: dict = loads(self.request.body)
         user = None
         try:
-            user = User.objects.get(username=credentials.get('username'))
+            user = User.objects.get(email=credentials.get('email'))
         except:
-            return JsonResponse('Username Not Found', safe=False)
+            return JsonResponse('Email Not Found', safe=False)
         password_authenticity: bool = check_password(credentials.get('password'), user.password)
         if password_authenticity:
             login(self.request, user)
