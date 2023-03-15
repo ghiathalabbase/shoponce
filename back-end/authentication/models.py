@@ -6,14 +6,43 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.core.validators import RegexValidator, MinLengthValidator
-
+from django.contrib.auth.hashers import make_password
+from django.apps import apps
 # Create your models here.
-@deconstructible
-class UnicodeUsernameValidator(RegexValidator):
-    regex = r"^\w+\Z"
-    message = _("Enter a valid username. This value may contain only letters, numbers, ./_ characters.")
-    flags = 0
+# @deconstructible
+# class UnicodeUsernameValidator(RegexValidator):
+#     regex = r"^\w+\Z"
+#     message = _("Enter a valid username. This value may contain only letters, numbers, ./_ characters.")
+#     flags = 0
+class ShoponceUserManager(UserManager):
+    def _create_user(self, email, password, **extra_fields):
+        """
+        Create and save a user with the given  email and password.
+        """
+        if not email:
+            raise ValueError("The given email must be set")
+        email = self.normalize_email(email)
+        user = self.model( email=email, **extra_fields)
+        user.password = make_password(password)
+        user.save(using=self._db)
+        return user
 
+    def create_user(self, email=None, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", False)
+        extra_fields.setdefault("is_superuser", False)
+        return self._create_user(email, password, **extra_fields)
+    
+    def create_superuser(self, email=None, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+
+        return self._create_user(email, password, **extra_fields)
+    
 class AbstractUser(AbstractBaseUser, PermissionsMixin):
     """
     An abstract base class implementing a fully featured User model with
@@ -21,15 +50,6 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
     Username, email and password are required. Other fields are optional.
     """
 
-    username_validators = [UnicodeUsernameValidator(), MinLengthValidator(6)]
-
-    username = models.CharField(
-        verbose_name=_("username"),
-        max_length=60,
-        unique=True,
-        validators=username_validators,
-        error_messages={"unique": _("This username is already taken, use another.")}
-    )
 
     email = models.EmailField(
         verbose_name=_('email address'),
@@ -52,11 +72,12 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
     )
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
     
-    objects = UserManager()
+    objects = ShoponceUserManager()
+
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = []
 
     class Meta:
         verbose_name = _("user")
@@ -71,7 +92,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
     def __str__(self):
-        return self.username
+        return self.email
 
 class User(AbstractUser):
     pass

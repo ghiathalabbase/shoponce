@@ -71,7 +71,6 @@ function Register() {
   const [fields, setFields] = useState(() => {
     return {
       name: new Field(/^[A-Za-z\s]*$/, [], 'A Name Field Must Not Have Any Special Character, Numbers Or Whitespaces.'),
-      username: new Field(/^\w{6,}$/i, [], 'Username Field Must Be At Least 8 Characters And Not Have Whitespaces Or Any Speical Character Except Underscore.'),
       email: new Field(/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/i,[], 'Invalid Email'),
       password: new Field(/.{8,}/i, [], 'your password must be at least 8 characters'),
       country_id: new Field(),
@@ -158,7 +157,7 @@ function Register() {
 
       // Gathering data from fields
       let formData = { user: {}, user_profile: {} }
-      let AuthenticationFields = ['username', 'email', 'password']
+      let AuthenticationFields = ['email', 'password']
       for (const key of fieldsKeys) {
         if (AuthenticationFields.includes(key)) {
           formData.user[key] = fields[key].value
@@ -181,7 +180,6 @@ function Register() {
       const errors = response.errors
       if (errors) {
         console.log(errors)
-        document.querySelector(`#username #invalid-message`).textContent = errors['username'] ? errors['username'][0] : ""
         document.querySelector(`#email #invalid-message`).textContent = errors['email'] ? errors['email'][0] : ""
       } else {
         console.log(response)
@@ -205,17 +203,6 @@ function Register() {
             onChange={validateField}
           />
           <InvalidField isValidField={fields.name.isValid()} invlaidMessage={fields.name.errorMessage} />
-        </div>
-        <div id="username">
-          <label htmlFor="">Username: </label>
-          <input
-            type="text"
-            name='username'
-            required
-            onChange={validateField}
-          />
-          <br />
-          <InvalidField isValidField={fields.username.isValid()} invlaidMessage={fields.username.errorMessage} />
         </div>
         <div id="email">
           <label htmlFor="">Email: </label>

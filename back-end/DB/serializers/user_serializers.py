@@ -5,7 +5,7 @@ from authentication.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'username')
+        fields = ('id', 'email')
 
 class ProfileSerializer(serializers.ModelSerializer):
     country = serializers.StringRelatedField()

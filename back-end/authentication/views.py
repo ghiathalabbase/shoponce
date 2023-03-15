@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from json import dumps, loads
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
-from DB.models import User, Profile, Country, City
+from DB.models import User, Profile
 from django.views import View
 from DB.serializers.user_serializers import UserSerializer, ProfileSerializer
 from .forms import CreateUserForm
@@ -19,14 +19,14 @@ class RegisterView(View):
     def post(self, request):
         errors = {'errors': {}}
         register_info: dict = loads(request.body)
-        encoded_username = register_info['user']['username'].encode('utf-8').hex()
-        if cache.get(encoded_username) is None:
+        encoded_email = register_info['user']['email'].encode('utf-8').hex()
+        if cache.get(encoded_email) is None:
 
             user_form = CreateUserForm(data=register_info['user'])
 
             if  user_form.is_valid():
-                cache.set(encoded_username, register_info, 3600)
-                print('http://127.0.0.1:8000/auth/verification?code=%s'% encoded_username)
+                cache.set(encoded_email, register_info, 3600)
+                print('http://127.0.0.1:8000/auth/verification?code=%s'% encoded_email)
 
                 # email = EmailMessage(
                 #     subject='Verification Email',
@@ -48,11 +48,7 @@ class RegisterView(View):
             errors['errors'] = user_form.errors
             return JsonResponse(errors)
         
-        unique_error = 'This %s is already taken, use another.'
-        errors['errors']= {'username': [unique_error % 'username']}
-        if cache.get(encoded_username)['user']['email'] == register_info['user']['email']:
-            errors['errors']['email'] = [unique_error % 'email']
-            return JsonResponse(errors)
+        errors['errors']= {'email': ['This email is already taken, use another.']}
         return JsonResponse(errors)
 
 class VerificatoinView(View):
